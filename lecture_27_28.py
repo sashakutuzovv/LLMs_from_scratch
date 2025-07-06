@@ -155,11 +155,6 @@ with torch.no_grad():
 print("Training loss:", train_loss)
 print("Validation loss:", val_loss)
 
-import torch
-
-from lecture_21 import GPT_CONFIG_124M
-
-
 def evaluate_model(model, train_loader, val_loader, device, eval_iter):
     model.eval()
     with torch.no_grad():
