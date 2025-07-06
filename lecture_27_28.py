@@ -253,3 +253,11 @@ plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
 # save just the model’s parameters to disk
 torch.save(model.state_dict(), "gpt124m.pth")
 print("Saved trained weights to gpt124m.pth")
+
+torch.save({
+    "mode_state_dict": model.state_dict(),
+    "optimizer_state_dict": optimizer.state_dict(),
+    },
+    "model_and_optimizer.pth"
+)
+
