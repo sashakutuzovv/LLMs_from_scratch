@@ -4,10 +4,6 @@ from lecture_25 import GPTModel, generate_text_simple
 from lecture_26 import GPT_CONFIG_124M, text_to_token_ids, token_ids_to_text
 import matplotlib.pyplot as plt
 
-model = GPTModel(GPT_CONFIG_124M)
-model.load_state_dict(torch.load("gpt124m.pth", map_location="cpu"))
-model.to("cpu")
-model.eval()
 tokenizer = tiktoken.get_encoding("gpt2")
 
 next_token_logits = torch.tensor(
@@ -59,24 +55,19 @@ def generate(model, idx, max_new_tokens, context_size, temperature=0.0, top_k=No
 
 torch.manual_seed(123)
 
-token_ids = generate(
-    model=model,
-    idx=text_to_token_ids("Every effort moves you", tokenizer),
-    max_new_tokens=15,
-    context_size=GPT_CONFIG_124M["context_length"],
-    top_k=25,
-    temperature=1.4
-)
+if __name__ == "__main__":
+    model = GPTModel(GPT_CONFIG_124M)
+    model.load_state_dict(torch.load("gpt124m.pth", map_location="cpu"))
+    model.to("cpu")
+    model.eval()
 
-print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
+    token_ids = generate(
+        model=model,
+        idx=text_to_token_ids("Every effort moves you", tokenizer),
+        max_new_tokens=15,
+        context_size=GPT_CONFIG_124M["context_length"],
+        top_k=25,
+        temperature=1.4
+    )
 
-
-
-
-
-
-
-
-
-
-
+    print("Output text:\n", token_ids_to_text(token_ids, tokenizer))
