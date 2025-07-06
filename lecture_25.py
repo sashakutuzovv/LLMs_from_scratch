@@ -42,14 +42,14 @@ class LayerNorm(nn.Module):
     def __init__(self, emb_dim):
         super().__init__()
         self.eps = 1e-5
-        self.scale = nn.Parameter(torch.ones(emb_dim))
-        self.shift = nn.Parameter(torch.zeros(emb_dim))
+        self.weight = nn.Parameter(torch.ones(emb_dim))
+        self.bias = nn.Parameter(torch.zeros(emb_dim))
 
     def forward(self, x):
         mean = x.mean(dim=-1, keepdim=True)
         var = x.var(dim=-1, keepdim=True, unbiased=False)
         norm_x = (x - mean) / torch.sqrt(var + self.eps)
-        return norm_x * self.scale + self.shift
+        return norm_x * self.weight + self.bias
 
 class GELU(nn.Module):
     def __init__(self):
@@ -115,6 +115,7 @@ class MultiHeadAttention(nn.Module):
         self.W_value = nn.Linear(d_in, d_out, bias=qkv_bias)
         self.dropout = nn.Dropout(dropout)
         self.register_buffer("mask", torch.triu(torch.ones(context_length, context_length), diagonal=1))
+        self.out_proj = nn.Linear(d_out, d_out)
 
     def forward(self, x):
         b, num_tokens, d_in = x.shape
@@ -141,7 +142,7 @@ class MultiHeadAttention(nn.Module):
 
         context_vec = (attn_weights @ values).transpose(1, 2)
         context_vec = context_vec.contiguous().view(b, num_tokens, self.d_out)
-        #context_vec = self.out_proj(context_vec)  # optional projection
+        context_vec = self.out_proj(context_vec)  # optional projection
         return context_vec
 
 import tiktoken
